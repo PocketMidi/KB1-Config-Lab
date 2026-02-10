@@ -2,62 +2,72 @@
   <div class="device-settings-page">
     <div class="page-header">
       <h2>Device Settings</h2>
-      <p>Configure KB1 device settings</p>
+      <p>Configure KB1 lever, touch, and scale settings</p>
     </div>
     
     <div v-if="!isConnected" class="not-connected-message">
-      <p>Please connect to your KB1 device to view settings.</p>
+      <p>Please connect to your KB1 device to view and configure settings.</p>
     </div>
     
     <div v-else class="settings-content">
-      <div class="settings-form">
-        <div class="form-group">
-          <label for="device-name">Device Name</label>
-          <input
-            id="device-name"
-            type="text"
-            v-model="localSettings.deviceName"
-            :disabled="isLoading"
-            @input="markChanged"
-          />
-        </div>
-        
-        <div class="form-group">
-          <label for="midi-channel">Default MIDI Channel</label>
-          <input
-            id="midi-channel"
-            type="number"
-            min="1"
-            max="16"
-            v-model.number="localSettings.midiChannel"
-            :disabled="isLoading"
-            @input="markChanged"
-          />
-          <span class="help-text">Channel 1-16</span>
-        </div>
-        
-        <div class="form-group">
-          <label for="brightness">Display Brightness</label>
-          <div class="slider-container">
-            <input
-              id="brightness"
-              type="range"
-              min="0"
-              max="100"
-              v-model.number="localSettings.brightness"
-              :disabled="isLoading"
-              @input="markChanged"
-            />
-            <span class="slider-value">{{ localSettings.brightness }}%</span>
-          </div>
-        </div>
-        
-        <!-- TODO: Add more KB1-specific settings -->
-        <div class="settings-info">
-          <p class="info-text">
-            Additional device-specific settings will be added here as the KB1 protocol is implemented.
-          </p>
-        </div>
+      <div class="settings-sections">
+        <LeverSettings
+          title="Lever"
+          :lever="1"
+          v-model="localSettings.lever1"
+          :cc-options="ccOptions"
+          :function-modes="functionModes"
+          :value-modes="valueModes"
+          :interpolations="interpolations"
+          @update:model-value="markChanged"
+        />
+
+        <LeverPushSettings
+          title="Lever Push"
+          :lever="1"
+          v-model="localSettings.leverPush1"
+          :cc-options="ccOptions"
+          :function-modes="functionModes"
+          :interpolations="interpolations"
+          @update:model-value="markChanged"
+        />
+
+        <LeverSettings
+          title="Lever"
+          :lever="2"
+          v-model="localSettings.lever2"
+          :cc-options="ccOptions"
+          :function-modes="functionModes"
+          :value-modes="valueModes"
+          :interpolations="interpolations"
+          @update:model-value="markChanged"
+        />
+
+        <LeverPushSettings
+          title="Lever Push"
+          :lever="2"
+          v-model="localSettings.leverPush2"
+          :cc-options="ccOptions"
+          :function-modes="functionModes"
+          :interpolations="interpolations"
+          @update:model-value="markChanged"
+        />
+
+        <TouchSettings
+          title="Touch Sensor"
+          v-model="localSettings.touch"
+          :cc-options="ccOptions"
+          :function-modes="functionModes"
+          @update:model-value="markChanged"
+        />
+
+        <ScaleSettings
+          title="Scales"
+          v-model="localSettings.scale"
+          :scales="scales"
+          :root-notes="rootNotes"
+          @update:model-value="markChanged"
+        />
       </div>
       
       <div class="action-bar">
@@ -104,6 +114,10 @@
 import { ref, watch } from 'vue';
 import { useDeviceState } from '../composables/useDeviceState';
 import type { DeviceSettings } from '../ble/kb1Protocol';
+import LeverSettings from '../components/LeverSettings.vue';
+import LeverPushSettings from '../components/LeverPushSettings.vue';
+import TouchSettings from '../components/TouchSettings.vue';
+import ScaleSettings from '../components/ScaleSettings.vue';
 
 const {
   isConnected,
@@ -116,6 +130,60 @@ const {
 
 const localSettings = ref<DeviceSettings>({ ...deviceSettings.value });
 const hasChanges = ref(false);
+
+// Options arrays for the components
+const ccOptions = [
+  { value: -1, label: 'Off' },
+  ...Array.from({ length: 128 }, (_, i) => ({ value: i, label: `CC ${i}` }))
+];
+
+const functionModes = [
+  { value: 0, label: 'Continuous' },
+  { value: 1, label: 'Toggle' },
+  { value: 2, label: 'Momentary' },
+];
+
+const valueModes = [
+  { value: 0, label: 'Absolute' },
+  { value: 1, label: 'Relative' },
+];
+
+const interpolations = [
+  { value: 0, label: 'Linear' },
+  { value: 1, label: 'Exponential' },
+  { value: 2, label: 'Logarithmic' },
+  { value: 3, label: 'S-Curve' },
+];
+
+const scales = [
+  { value: 0, label: 'Chromatic' },
+  { value: 1, label: 'Major' },
+  { value: 2, label: 'Minor' },
+  { value: 3, label: 'Dorian' },
+  { value: 4, label: 'Phrygian' },
+  { value: 5, label: 'Lydian' },
+  { value: 6, label: 'Mixolydian' },
+  { value: 7, label: 'Aeolian' },
+  { value: 8, label: 'Locrian' },
+  { value: 9, label: 'Blues' },
+  { value: 10, label: 'Pentatonic Major' },
+  { value: 11, label: 'Pentatonic Minor' },
+];
+
+const rootNotes = [
+  { value: 0, label: 'C' },
+  { value: 1, label: 'C#' },
+  { value: 2, label: 'D' },
+  { value: 3, label: 'D#' },
+  { value: 4, label: 'E' },
+  { value: 5, label: 'F' },
+  { value: 6, label: 'F#' },
+  { value: 7, label: 'G' },
+  { value: 8, label: 'G#' },
+  { value: 9, label: 'A' },
+  { value: 10, label: 'A#' },
+  { value: 11, label: 'B' },
+];
 
 // Watch for device settings changes from the device
 watch(deviceSettings, (newSettings) => {
@@ -169,7 +237,7 @@ async function handleSave() {
 <style scoped>
 .device-settings-page {
   padding: 2rem;
-  max-width: 800px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -200,103 +268,10 @@ async function handleSave() {
   gap: 2rem;
 }
 
-.settings-form {
+.settings-sections {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: var(--color-background-soft);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-label {
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-input[type="text"],
-input[type="number"] {
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-background);
-  color: var(--color-text);
-  font-size: 1rem;
-}
-
-input[type="text"]:focus,
-input[type="number"]:focus {
-  outline: none;
-  border-color: var(--color-border-hover);
-}
-
-input:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.slider-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-input[type="range"] {
-  flex: 1;
-  height: 6px;
-  background: var(--color-border);
-  border-radius: 3px;
-  outline: none;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  background: #3b82f6;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-input[type="range"]::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  background: #3b82f6;
-  border-radius: 50%;
-  cursor: pointer;
-  border: none;
-}
-
-.slider-value {
-  min-width: 3rem;
-  text-align: right;
-  font-weight: 500;
-}
-
-.help-text {
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-}
-
-.settings-info {
-  padding: 1rem;
-  background: var(--color-background-mute);
-  border-radius: 6px;
-  margin-top: 1rem;
-}
-
-.info-text {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  font-style: italic;
+  gap: 2rem;
 }
 
 .action-bar {
@@ -305,15 +280,17 @@ input[type="range"]::-moz-range-thumb {
   justify-content: flex-end;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
 }
 
 .btn {
   padding: 0.75rem 1.5rem;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--kb1-radius-md, 6px);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .btn:disabled {
@@ -322,21 +299,35 @@ input[type="range"]::-moz-range-thumb {
 }
 
 .btn-primary {
-  background: #3b82f6;
-  color: white;
+  background: var(--btn-primary-bg, #3b82f6);
+  color: var(--btn-primary-color, white);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #2563eb;
+  background: var(--btn-primary-bg-hover, #2563eb);
 }
 
 .btn-secondary {
-  background: var(--color-background-mute);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
+  background: var(--btn-secondary-bg, var(--color-background-mute));
+  color: var(--btn-secondary-color, var(--color-text));
+  border: var(--btn-secondary-border, 1px solid var(--color-border));
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--color-background-soft);
+  background: var(--btn-secondary-bg-hover, var(--color-background-soft));
+}
+
+@media (max-width: 768px) {
+  .device-settings-page {
+    padding: 1rem;
+  }
+
+  .action-bar {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
 }
 </style>
