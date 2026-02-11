@@ -11,7 +11,11 @@ export const PresetStore = {
   },
 
   loadSnapshot(name: string): Snapshot | null {
-    const raw = localStorage.getItem(SNAPSHOT_PREFIX + name);
-    return raw ? JSON.parse(raw) : null;
+    try {
+      const raw = localStorage.getItem(SNAPSHOT_PREFIX + name);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
   },
 };

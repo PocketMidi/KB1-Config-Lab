@@ -127,10 +127,13 @@ function resetToPrevious() {
 
   values.value = snap;
 
-  selectedParams.value.forEach(async (p) => {
-    const val = snap[p.id] ?? p.defaultValue;
-    await midiBle.sendControlChange(p.cc, mapUiToCc(val, p));
-  });
+  // Send CC messages for all selected parameters
+  (async () => {
+    for (const p of selectedParams.value) {
+      const val = snap[p.id] ?? p.defaultValue;
+      await midiBle.sendControlChange(p.cc, mapUiToCc(val, p));
+    }
+  })();
 }
 
 function toggleLock(id: string) {
@@ -142,17 +145,27 @@ function centerValue(p: Parameter) {
   onChangeValue(p, center);
 }
 
+function calculateStep(param: Parameter, isFineMode: boolean): number {
+  const baseStep = param.step ?? Math.max(1, Math.round((param.max - param.min) / 100));
+  return isFineMode ? Math.max(1, Math.round(baseStep / 5)) : baseStep;
+}
+
 function handleSnapshotRecall(snap: Record<string, number>) {
   values.value = snap;
 }
 
 function handleGroupMorphSetValues(next: Record<string, number>) {
   values.value = next;
-  selectedParams.value.forEach(async (p) => {
-    const val = next[p.id] ?? p.defaultValue;
-    await midiBle.sendControlChange(p.cc, mapUiToCc(val, p));
-  });
+  
+  // Send CC messages for all selected parameters
+  (async () => {
+    for (const p of selectedParams.value) {
+      const val = next[p.id] ?? p.defaultValue;
+      await midiBle.sendControlChange(p.cc, mapUiToCc(val, p));
+    }
+  })();
 }
+
 </script>
 
 <template>
@@ -191,11 +204,7 @@ function handleGroupMorphSetValues(next: Record<string, number>) {
         :key="p.id"
         :parameter="p"
         :value="values[p.id] ?? p.defaultValue"
-        :step="
-          fineMode
-            ? Math.max(1, Math.round((p.step ?? Math.max(1, Math.round((p.max - p.min) / 100))) / 5))
-            : p.step ?? Math.max(1, Math.round((p.max - p.min) / 100))
-        "
+        :step="calculateStep(p, fineMode)"
         :locked="!!locked[p.id]"
         @lock="toggleLock(p.id)"
         @center="centerValue(p)"
