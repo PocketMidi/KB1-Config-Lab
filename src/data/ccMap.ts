@@ -223,12 +223,12 @@ export function getCCGroups(): CCGroup[] {
 }
 
 /**
- * Category overrides for factory default CCs
- * These CCs should appear under different categories for UI purposes if needed
- * Currently empty - all CCs use their CSV-defined categories
+ * Category overrides for specific CCs when needed
+ * Reserved for future use - currently all CCs use their CSV-defined categories.
+ * If overrides are added, ensure the category name matches the exact casing used in the CSV.
  */
 const FACTORY_DEFAULT_CATEGORY_OVERRIDES: Record<number, string> = {
-  // No overrides - use CSV categories
+  // Example: 24: 'GLOBAL', // Would override CC 24 to GLOBAL category
 };
 
 /**
