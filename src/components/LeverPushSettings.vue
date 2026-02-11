@@ -140,6 +140,9 @@ watch(() => model.value.ccNumber, (cc) => {
 
 // Watch selectedCategory to ensure a valid parameter is selected
 watch(selectedCategory, (cat) => {
+  // If "None" is selected, keep it
+  if (model.value.ccNumber === -1) return
+  
   const ok = props.ccMapByNumber.get(model.value.ccNumber)?.category === cat
   if (!ok) {
     const first = filteredOptions.value.find(o => o.value >= 0)
