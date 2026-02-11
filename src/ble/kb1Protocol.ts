@@ -55,6 +55,7 @@ export interface TouchSettings {
   minCCValue: number;
   maxCCValue: number;
   functionMode: number;
+  /** Touch threshold value (0-65535). Default: 24000. Lower = more sensitive */
   threshold?: number;
 }
 

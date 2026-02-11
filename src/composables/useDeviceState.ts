@@ -246,7 +246,7 @@ export function useDeviceState() {
       console.log('Baseline snapshot restored');
     } else {
       console.warn('No snapshot available to restore');
-      throw new Error('No snapshot available to restore');
+      throw new Error('No snapshot available to restore. Please load from device first.');
     }
   };
 

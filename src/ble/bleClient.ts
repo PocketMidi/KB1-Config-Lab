@@ -6,6 +6,8 @@
  * connecting, disconnecting, and sending/receiving data.
  */
 
+import type { LeverSettings, LeverPushSettings, TouchSettings, ScaleSettings } from './kb1Protocol';
+
 // KB1-specific BLE UUIDs (custom, not standard MIDI BLE)
 // These UUIDs are defined in the KB1 firmware (firmware/src/objects/Constants.h)
 // Service UUID: KB1 custom service
@@ -175,13 +177,27 @@ export class BLEClient {
   /**
    * Read all settings from the device characteristics
    */
-  async readAllSettings(): Promise<any> {
+  async readAllSettings(): Promise<{
+    lever1?: LeverSettings;
+    leverPush1?: LeverPushSettings;
+    lever2?: LeverSettings;
+    leverPush2?: LeverPushSettings;
+    touch?: TouchSettings;
+    scale?: ScaleSettings;
+  }> {
     if (!this.server?.connected) {
       throw new Error('Not connected to device');
     }
 
     try {
-      const settings: any = {};
+      const settings: {
+        lever1?: LeverSettings;
+        leverPush1?: LeverPushSettings;
+        lever2?: LeverSettings;
+        leverPush2?: LeverPushSettings;
+        touch?: TouchSettings;
+        scale?: ScaleSettings;
+      } = {};
 
       // Read Lever 1 settings
       if (this.lever1Characteristic) {
@@ -230,7 +246,7 @@ export class BLEClient {
   /**
    * Parse lever data from DataView (little-endian int32)
    */
-  private parseLeverData(data: DataView): any {
+  private parseLeverData(data: DataView): LeverSettings {
     return {
       ccNumber: data.getInt32(0, true),
       minCCValue: data.getInt32(4, true),
@@ -248,7 +264,7 @@ export class BLEClient {
   /**
    * Parse lever push data from DataView (little-endian int32)
    */
-  private parseLeverPushData(data: DataView): any {
+  private parseLeverPushData(data: DataView): LeverPushSettings {
     return {
       ccNumber: data.getInt32(0, true),
       minCCValue: data.getInt32(4, true),
@@ -264,7 +280,7 @@ export class BLEClient {
   /**
    * Parse touch data from DataView (little-endian int32)
    */
-  private parseTouchData(data: DataView): any {
+  private parseTouchData(data: DataView): TouchSettings {
     return {
       ccNumber: data.getInt32(0, true),
       minCCValue: data.getInt32(4, true),
@@ -276,7 +292,7 @@ export class BLEClient {
   /**
    * Parse scale data from DataView (little-endian int32)
    */
-  private parseScaleData(data: DataView): any {
+  private parseScaleData(data: DataView): ScaleSettings {
     return {
       scaleType: data.getInt32(0, true),
       rootNote: data.getInt32(4, true),
