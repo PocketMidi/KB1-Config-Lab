@@ -223,6 +223,15 @@ export function getCCGroups(): CCGroup[] {
 }
 
 /**
+ * Category overrides for factory default CCs
+ * These CCs should appear under "Global" category for UI purposes
+ * Note: CC 24 (Release) is in the Volume category in the CSV but should appear in Global for factory defaults
+ */
+const FACTORY_DEFAULT_CATEGORY_OVERRIDES: Record<number, string> = {
+  24: 'Global',  // Release (Volume category) - override to Global for factory defaults
+};
+
+/**
  * Get sorted CC options with Velocity first
  * This ensures Velocity (CC 128) always appears at the top of parameter dropdowns
  */
@@ -238,7 +247,7 @@ export function getSortedCCOptions(): Array<{ value: number; label: string; grou
     options.push({
       value: 128,
       label: velocityEntry.parameter,
-      group: velocityEntry.category,
+      group: FACTORY_DEFAULT_CATEGORY_OVERRIDES[128] ?? velocityEntry.category,
     });
   }
   
@@ -250,7 +259,7 @@ export function getSortedCCOptions(): Array<{ value: number; label: string; grou
         options.push({
           value: entry.ccNumber,
           label: entry.parameter,
-          group: group.category,
+          group: FACTORY_DEFAULT_CATEGORY_OVERRIDES[entry.ccNumber] ?? group.category,
         });
       }
     }
@@ -290,8 +299,23 @@ export function midiToRelative(midiValue: number, min: number, max: number): num
 }
 
 /**
- * Get the full CC map
+ * Get the full CC map with category overrides applied
  */
 export function getCCMap(): Map<number, CCEntry> {
-  return state.ccMap;
+  const map = new Map<number, CCEntry>();
+  
+  // Copy entries from state.ccMap with category overrides applied
+  for (const [ccNumber, entry] of state.ccMap.entries()) {
+    const overrideCategory = FACTORY_DEFAULT_CATEGORY_OVERRIDES[ccNumber];
+    if (overrideCategory) {
+      map.set(ccNumber, {
+        ...entry,
+        category: overrideCategory,
+      });
+    } else {
+      map.set(ccNumber, entry);
+    }
+  }
+  
+  return map;
 }
