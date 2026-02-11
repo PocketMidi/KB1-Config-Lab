@@ -7,9 +7,12 @@
     
     <div v-if="!isConnected" class="not-connected-message">
       <p>Please connect to your KB1 device to view and configure settings.</p>
+      <p style="margin-top: 1rem; font-style: italic; color: var(--color-text-muted);">
+        (Development mode: Settings shown below for testing)
+      </p>
     </div>
     
-    <div v-else class="settings-content">
+    <div class="settings-content">
       <div class="action-bar">
         <button
           class="btn btn-secondary"
