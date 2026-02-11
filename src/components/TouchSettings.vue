@@ -39,12 +39,12 @@
 
       <div class="group">
         <label for="touch-relativeMin">Relative Min</label>
-        <input type="text" id="touch-relativeMin" :value="relativeMin" readonly disabled />
+        <input type="text" id="touch-relativeMin" :value="relativeMin" readonly class="readonly-field" />
       </div>
 
       <div class="group">
         <label for="touch-relativeMax">Relative Max</label>
-        <input type="text" id="touch-relativeMax" :value="relativeMax" readonly disabled />
+        <input type="text" id="touch-relativeMax" :value="relativeMax" readonly class="readonly-field" />
       </div>
     </div>
   </div>
@@ -233,5 +233,11 @@ const relativeMax = computed(() => {
 .group select:focus {
   outline: none;
   border-color: var(--color-border-hover);
+}
+
+.readonly-field {
+  background: var(--color-background-mute) !important;
+  cursor: not-allowed;
+  color: var(--color-text-muted);
 }
 </style>

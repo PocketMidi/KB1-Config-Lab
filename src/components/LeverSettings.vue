@@ -51,12 +51,12 @@
 
       <div class="group">
         <label :for="`lever-relativeMin-${lever}`">Relative Min</label>
-        <input type="text" :id="`lever-relativeMin-${lever}`" :value="relativeMin" readonly disabled />
+        <input type="text" :id="`lever-relativeMin-${lever}`" :value="relativeMin" readonly class="readonly-field" />
       </div>
 
       <div class="group">
         <label :for="`lever-relativeMax-${lever}`">Relative Max</label>
-        <input type="text" :id="`lever-relativeMax-${lever}`" :value="relativeMax" readonly disabled />
+        <input type="text" :id="`lever-relativeMax-${lever}`" :value="relativeMax" readonly class="readonly-field" />
       </div>
 
       <div class="group">
@@ -300,5 +300,11 @@ const relativeMax = computed(() => {
   font-size: 0.875rem;
   color: var(--color-text-muted);
   min-width: 2rem;
+}
+
+.readonly-field {
+  background: var(--color-background-mute) !important;
+  cursor: not-allowed;
+  color: var(--color-text-muted);
 }
 </style>
