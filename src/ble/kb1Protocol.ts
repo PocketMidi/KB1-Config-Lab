@@ -325,7 +325,7 @@ export class KB1Protocol {
         minCCValue: 0,
         maxCCValue: 127,
         stepSize: 1,
-        functionMode: LeverFunctionMode.INTERPOLATED, // 0 in firmware
+        functionMode: 0, // Interpolated
         valueMode: ValueMode.BIPOLAR,
         onsetTime: 100,
         offsetTime: 100,
@@ -336,7 +336,7 @@ export class KB1Protocol {
         ccNumber: 24,
         minCCValue: 31,
         maxCCValue: 127,
-        functionMode: LeverPushFunctionMode.INTERPOLATED, // 0 in firmware
+        functionMode: 0, // Interpolated
         onsetTime: 100,
         offsetTime: 100,
         onsetType: InterpolationType.LINEAR,
@@ -347,7 +347,7 @@ export class KB1Protocol {
         minCCValue: 0,
         maxCCValue: 127,
         stepSize: 1,
-        functionMode: LeverFunctionMode.INTERPOLATED, // 0 in firmware
+        functionMode: 0, // Interpolated
         valueMode: ValueMode.BIPOLAR,
         onsetTime: 100,
         offsetTime: 100,
@@ -358,7 +358,7 @@ export class KB1Protocol {
         ccNumber: 128,
         minCCValue: 87,
         maxCCValue: 87,
-        functionMode: LeverPushFunctionMode.RESET, // 3 in firmware
+        functionMode: 3, // Reset
         onsetTime: 100,
         offsetTime: 100,
         onsetType: InterpolationType.LINEAR,
@@ -368,7 +368,7 @@ export class KB1Protocol {
         ccNumber: 1,
         minCCValue: 64,
         maxCCValue: 127,
-        functionMode: TouchFunctionMode.CONTINUOUS, // 2 in firmware
+        functionMode: 2, // Continuous
         threshold: 24000,
       },
       scale: {
