@@ -10,6 +10,42 @@
     </div>
     
     <div v-else class="settings-content">
+      <div class="action-bar">
+        <button
+          class="btn btn-secondary"
+          @click="handleLoadClick"
+          :disabled="isLoading"
+        >
+          <span v-if="isLoading">Loading...</span>
+          <span v-else>Load from Device</span>
+        </button>
+        
+        <button
+          class="btn btn-secondary"
+          @click="handleResetDefaults"
+          :disabled="isLoading"
+        >
+          Reset to Defaults
+        </button>
+        
+        <button
+          class="btn btn-secondary"
+          @click="handleReset"
+          :disabled="isLoading || !hasChanges"
+        >
+          Reset Changes
+        </button>
+        
+        <button
+          class="btn btn-primary"
+          @click="handleSaveToDevice"
+          :disabled="isLoading || !hasChanges"
+        >
+          <span v-if="isLoading">Saving...</span>
+          <span v-else>Save to Device</span>
+        </button>
+      </div>
+      
       <div class="settings-sections">
         <LeverSettings
           title="Lever"
@@ -78,59 +114,6 @@
           :rootNotes="rootNotes"
           @update:modelValue="markChanged"
         />
-      </div>
-      
-      <div class="action-bar">
-        <button
-          class="btn btn-secondary"
-          @click="handleLoadClick"
-          :disabled="isLoading"
-        >
-          <span v-if="isLoading">Loading...</span>
-          <span v-else>Load from Device</span>
-        </button>
-        
-        <button
-          class="btn btn-secondary"
-          @click="handleRestoreSnapshot"
-          :disabled="isLoading"
-        >
-          Restore from Snapshot
-        </button>
-        
-        <button
-          class="btn btn-secondary"
-          @click="handleResetDefaults"
-          :disabled="isLoading"
-        >
-          Reset to Defaults
-        </button>
-        
-        <button
-          class="btn btn-secondary"
-          @click="handleReset"
-          :disabled="isLoading || !hasChanges"
-        >
-          Reset Changes
-        </button>
-        
-        <button
-          class="btn btn-primary"
-          @click="handleApply"
-          :disabled="isLoading || !hasChanges"
-        >
-          <span v-if="isLoading">Applying...</span>
-          <span v-else>Apply to Device</span>
-        </button>
-        
-        <button
-          class="btn btn-primary"
-          @click="handleSave"
-          :disabled="isLoading"
-        >
-          <span v-if="isLoading">Saving...</span>
-          <span v-else>Save to Flash</span>
-        </button>
       </div>
     </div>
   </div>
@@ -285,17 +268,6 @@ async function handleLoadClick() {
   }
 }
 
-async function handleRestoreSnapshot() {
-  try {
-    recallBaseline();
-    localSettings.value = { ...deviceSettings.value };
-    hasChanges.value = false;
-  } catch (error) {
-    console.error('Failed to restore from snapshot:', error);
-    alert('No snapshot available to restore');
-  }
-}
-
 async function handleResetDefaults() {
   if (confirm('Reset all settings to firmware defaults? This will discard current changes.')) {
     try {
@@ -314,24 +286,17 @@ function handleReset() {
   hasChanges.value = false;
 }
 
-async function handleApply() {
+async function handleSaveToDevice() {
   try {
+    // First apply the settings to the device RAM
     await sendSettings(localSettings.value);
-    hasChanges.value = false;
-    alert('Settings applied successfully');
-  } catch (error) {
-    console.error('Failed to apply settings:', error);
-    alert('Failed to apply settings to device');
-  }
-}
-
-async function handleSave() {
-  try {
+    // Then persist to flash memory
     await saveToFlash();
-    alert('Settings saved to device flash memory');
+    hasChanges.value = false;
+    alert('Settings saved to device successfully');
   } catch (error) {
-    console.error('Failed to save to flash:', error);
-    alert('Failed to save to device flash memory');
+    console.error('Failed to save settings:', error);
+    alert('Failed to save settings to device');
   }
 }
 </script>
@@ -370,19 +335,19 @@ async function handleSave() {
   gap: 2rem;
 }
 
-.settings-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
 .action-bar {
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-border);
   flex-wrap: wrap;
+}
+
+.settings-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .btn {
