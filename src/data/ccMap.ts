@@ -87,24 +87,22 @@ function normalizeParameterName(name: string): string {
 }
 
 /**
- * Normalize category name (remove embedded newlines and apply Title Case)
+ * Normalize category name (remove embedded newlines and convert to Title Case)
+ * Converts CSV category names to consistent Title Case format:
+ * - "GLOBAL" -> "Global"
+ * - "VOLUME" -> "Volume"
+ * - "WAVETABLE\nPosition" -> "Wavetable Position"
  */
 function normalizeCategoryName(name: string): string {
-  const flat = name.replace(/\s*\n\s*/g, ' ').trim();
-  const lower = flat.toLowerCase();
-  return lower.replace(/\b\w/g, c => c.toUpperCase());
-}
-
-/**
- * Get the correct row keys from parsed CSV headers
- * Supports both "Category & CC Number" and legacy "CC Number" headers
- */
-function getRowKeys(row: Record<string, string>) {
-  const keys = Object.keys(row);
-  const ccKey = keys.find(k => k.toLowerCase().includes('cc number')) || 'CC Number';
-  const paramKey = keys.find(k => k.toLowerCase().includes('parameter')) || 'Parameter';
-  const rangeKey = keys.find(k => k.toLowerCase().includes('polyend range')) || 'Polyend Range';
-  return { ccKey, paramKey, rangeKey };
+  // Remove embedded newlines and trim
+  const cleaned = name.replace(/\s*\n\s*/g, ' ').trim();
+  
+  // Convert to Title Case
+  return cleaned
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 /**
