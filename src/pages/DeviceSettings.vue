@@ -145,15 +145,6 @@ const hasChanges = ref(false);
 // Load CC map on mount
 onMounted(async () => {
   try {
-    // Fetch with cache busting to ensure fresh data
-    const baseUrl = import.meta.env.BASE_URL || '/';
-    const url = new URL('Polyend', baseUrl).toString();
-    const response = await fetch(url, { cache: 'no-store' });
-    
-    if (!response.ok) {
-      console.warn('Failed to fetch Polyend CSV, falling back to basic CC labels');
-    }
-    
     await loadPolyendCCMap();
   } catch (error) {
     console.error('Failed to load CC map:', error);
