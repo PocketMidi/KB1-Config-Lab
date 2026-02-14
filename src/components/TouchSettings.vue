@@ -71,6 +71,7 @@ type TouchModel = {
   minCCValue: number
   maxCCValue: number
   functionMode: number
+  threshold?: number
 }
 
 const props = defineProps<{

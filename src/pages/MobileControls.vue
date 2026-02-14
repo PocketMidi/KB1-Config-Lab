@@ -39,13 +39,13 @@
       </AccordionSection>
       
       <AccordionSection
-        :title="`Lever Push 1`"
+        :title="`Press 1`"
         :subtitle="getLeverPushSubtitle(localSettings.leverPush1)"
         :id="'lever-push-1'"
         :default-open="false"
       >
         <LeverPushSettings
-          title="Lever Push"
+          title="Press"
           :lever="1"
           v-model="localSettings.leverPush1"
           :ccOptions="ccOptions"
@@ -78,13 +78,13 @@
       </AccordionSection>
       
       <AccordionSection
-        :title="`Lever Push 2`"
+        :title="`Press 2`"
         :subtitle="getLeverPushSubtitle(localSettings.leverPush2)"
         :id="'lever-push-2'"
         :default-open="false"
       >
         <LeverPushSettings
-          title="Lever Push"
+          title="Press"
           :lever="2"
           v-model="localSettings.leverPush2"
           :ccOptions="ccOptions"
