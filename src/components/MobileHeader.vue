@@ -65,18 +65,6 @@ const connectionClass = computed(() => ({
   width: auto;
 }
 
-.header-title {
-  margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  text-align: center;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
 .connection-bar {
   display: flex;
   align-items: center;

@@ -62,6 +62,7 @@ defineEmits<{
 
 .tab-button:hover {
   opacity: 0.6;
+  background: transparent;
 }
 
 .tab-button.active {

@@ -416,6 +416,7 @@ body {
 
 .nav-tab:hover {
   opacity: 0.6;
+  background: transparent;
 }
 
 .nav-tab.active {
