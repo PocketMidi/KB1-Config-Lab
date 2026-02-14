@@ -135,9 +135,30 @@ function handleMouseUp(index: number) {
   if (!slider) return;
   
   if (slider.momentary && dragging.value === index) {
-    // Spring back to default
+    // Spring back to default with smooth animation
     const defaultValue = getDefaultValue(slider);
-    handleSliderChange(index, defaultValue);
+    
+    // Animate the spring-back over 300ms
+    const startValue = slider.value;
+    const startTime = performance.now();
+    const duration = 300; // ms
+    
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Ease-out cubic curve for natural spring feel
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      
+      const currentValue = startValue + (defaultValue - startValue) * easeOut;
+      handleSliderChange(index, Math.round(currentValue));
+      
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    
+    requestAnimationFrame(animate);
   }
   
   dragging.value = null;
@@ -280,8 +301,8 @@ function getSliderPercent(slider: SliderConfig): number {
               />
             </div>
             
-            <!-- CC label (always visible for debugging, can be hidden in production) -->
-            <div class="cc-label">CC {{ slider.cc }}</div>
+            <!-- CC label (only visible in settings mode) -->
+            <div v-if="settingsVisible" class="cc-label">CC {{ slider.cc }}</div>
           </div>
         </div>
         
@@ -383,6 +404,8 @@ function getSliderPercent(slider: SliderConfig): number {
 .color-bar {
   height: 3px;
   border-radius: 2px;
+  box-shadow: 0 0 8px currentColor;
+  opacity: 0.9;
 }
 
 .sliders-row {
@@ -402,10 +425,15 @@ function getSliderPercent(slider: SliderConfig): number {
   width: 80px;
   height: 350px;
   background: var(--color-background-mute, #2a2a2a);
-  border: 1px solid var(--color-border, #3a3a3a);
+  border: 2px solid var(--color-border, #3a3a3a);
   border-radius: 8px;
   overflow: hidden;
   cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.slider-track:hover {
+  border-color: var(--color-border-hover, #4a4a4a);
 }
 
 .center-marker {
@@ -425,9 +453,10 @@ function getSliderPercent(slider: SliderConfig): number {
   bottom: 0;
   left: 0;
   right: 0;
-  transition: height 0.1s ease-out;
+  transition: height 0.15s ease-out;
   pointer-events: none;
-  opacity: 0.7;
+  opacity: 0.8;
+  box-shadow: 0 0 10px currentColor;
 }
 
 .slider-input {
