@@ -32,31 +32,40 @@
       </div>
 
       <div class="group">
+        <label for="touch-min">Min</label>
+        <ValueControl
+          v-model="userMin"
+          :min="0"
+          :max="100"
+          :step="1"
+          :small-step="5"
+          :large-step="10"
+        />
+      </div>
+
+      <div class="group">
+        <label for="touch-max">Max</label>
+        <ValueControl
+          v-model="userMax"
+          :min="0"
+          :max="100"
+          :step="1"
+          :small-step="5"
+          :large-step="10"
+        />
+      </div>
+
+      <div class="group">
         <label for="touch-threshold">Threshold</label>
-        <div class="number-with-unit">
-          <input type="number" id="touch-threshold" v-model.number="model.threshold" min="0" max="65535" step="100" />
-          <span class="hint-text">higher = less sensitive</span>
-        </div>
-      </div>
-
-      <div class="group">
-        <label for="touch-maxCCValue">CC Max</label>
-        <input type="number" id="touch-maxCCValue" v-model.number="model.maxCCValue" min="0" max="127" />
-      </div>
-
-      <div class="group">
-        <label for="touch-minCCValue">CC Min</label>
-        <input type="number" id="touch-minCCValue" v-model.number="model.minCCValue" min="0" max="127" />
-      </div>
-
-      <div class="group">
-        <label for="touch-relativeMin">Relative Min</label>
-        <input type="text" id="touch-relativeMin" :value="relativeMin" readonly class="readonly-field" />
-      </div>
-
-      <div class="group">
-        <label for="touch-relativeMax">Relative Max</label>
-        <input type="text" id="touch-relativeMax" :value="relativeMax" readonly class="readonly-field" />
+        <ValueControl
+          v-model="userThreshold"
+          :min="0"
+          :max="100"
+          :step="1"
+          :small-step="5"
+          :large-step="10"
+        />
+        <span class="hint-text">Sensitivity: 0 = most sensitive, 100 = least sensitive</span>
       </div>
     </div>
   </div>
@@ -64,7 +73,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { midiToRelative, type CCEntry } from '../data/ccMap'
+import { type CCEntry } from '../data/ccMap'
+import ValueControl from './ValueControl.vue'
 
 type TouchModel = {
   ccNumber: number
@@ -157,32 +167,47 @@ const parameterRange = computed(() => {
   return undefined
 })
 
-// Compute relative min value
-const relativeMin = computed(() => {
-  const entry = currentEntry.value
-  if (!entry?.range) {
-    return '—'
+// Conversion functions
+function unipolarToMidi(userValue: number): number {
+  return Math.round((userValue / 100) * 127)
+}
+
+function midiToUnipolar(midiValue: number): number {
+  return Math.round((midiValue / 127) * 100)
+}
+
+// User-facing Min value (0-100, always unipolar for Touch)
+const userMin = computed({
+  get: () => midiToUnipolar(model.value.minCCValue),
+  set: (userValue: number) => {
+    model.value.minCCValue = unipolarToMidi(userValue)
   }
-  const value = midiToRelative(
-    model.value.minCCValue,
-    entry.range.min,
-    entry.range.max
-  )
-  return String(value)
 })
 
-// Compute relative max value
-const relativeMax = computed(() => {
-  const entry = currentEntry.value
-  if (!entry?.range) {
-    return '—'
+// User-facing Max value (0-100, always unipolar for Touch)
+const userMax = computed({
+  get: () => midiToUnipolar(model.value.maxCCValue),
+  set: (userValue: number) => {
+    model.value.maxCCValue = unipolarToMidi(userValue)
   }
-  const value = midiToRelative(
-    model.value.maxCCValue,
-    entry.range.min,
-    entry.range.max
-  )
-  return String(value)
+})
+
+// Threshold range in firmware (based on typical capacitive touch sensor values)
+const THRESHOLD_MIN = 24000
+const THRESHOLD_MAX = 64000
+
+// User-facing Threshold (0-100 percentage)
+const userThreshold = computed({
+  get: () => {
+    const threshold = model.value.threshold ?? THRESHOLD_MIN
+    // Convert from firmware range to 0-100 percentage
+    // Note: Higher firmware value = less sensitive, so we map accordingly
+    return Math.round(((threshold - THRESHOLD_MIN) / (THRESHOLD_MAX - THRESHOLD_MIN)) * 100)
+  },
+  set: (userValue: number) => {
+    // Convert from 0-100 percentage to firmware range
+    model.value.threshold = Math.round((userValue / 100) * (THRESHOLD_MAX - THRESHOLD_MIN) + THRESHOLD_MIN)
+  }
 })
 </script>
 
@@ -281,7 +306,6 @@ const relativeMax = computed(() => {
   color: var(--color-text);
 }
 
-.group input,
 .group select {
   padding: 0.75rem;
   border: 1px solid var(--color-border);
@@ -292,43 +316,20 @@ const relativeMax = computed(() => {
 }
 
 @media (max-width: 768px) {
-  .group input,
   .group select {
     padding: 0.625rem 0.5rem;
   }
 }
 
-.group input:focus,
 .group select:focus {
   outline: none;
   border-color: var(--color-border-hover);
 }
 
-.number-with-unit {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.number-with-unit input {
-  flex: 1;
-}
-
-.number-with-unit span {
-  font-size: 0.875rem;
-  color: var(--color-text-muted);
-  min-width: 2rem;
-}
-
 .hint-text {
   font-size: 0.75rem;
   font-style: italic;
-  white-space: nowrap;
-}
-
-.readonly-field {
-  background: var(--color-background-mute) !important;
-  cursor: not-allowed;
   color: var(--color-text-muted);
+  margin-top: 0.25rem;
 }
 </style>
