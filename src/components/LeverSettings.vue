@@ -32,7 +32,7 @@
       </div>
 
       <div class="group">
-        <label :for="`lever-functionMode-${lever}`">Function Mode</label>
+        <label :for="`lever-functionMode-${lever}`">Profile</label>
         <select :id="`lever-functionMode-${lever}`" v-model.number="model.functionMode">
           <option v-for="opt in functionModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
@@ -57,7 +57,7 @@
       <!-- Mode-specific Type dropdown for Peak & Decay mode -->
       <div v-if="isPeakDecayMode" class="group">
         <label :for="`lever-type-${lever}`">Type</label>
-        <select :id="`lever-type-${lever}`" v-model.number="model.offsetType">
+        <select :id="`lever-type-${lever}`" v-model.number="peakDecayType">
           <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
       </div>
@@ -233,16 +233,26 @@ const isIncrementalMode = computed(() => model.value.functionMode === 2)
 // MIDI range is 0-127 (128 total values)
 // stepSize represents the number of MIDI values per step
 const stepOptions = [
-  { value: 32, label: '4 steps (32 MIDI values per step)' },   // 128/32 = 4 steps
-  { value: 16, label: '8 steps (16 MIDI values per step)' },   // 128/16 = 8 steps
-  { value: 8, label: '16 steps (8 MIDI values per step)' },    // 128/8 = 16 steps
-  { value: 4, label: '32 steps (4 MIDI values per step)' },    // 128/4 = 32 steps
-  { value: 2, label: '64 steps (2 MIDI values per step)' },    // 128/2 = 64 steps
+  { value: 32, label: '4' },
+  { value: 16, label: '8' },
+  { value: 8, label: '16' },
+  { value: 4, label: '32' },
+  { value: 2, label: '64' },
 ]
 
 // Computed property for Interpolated mode to gang attack and decay types together
 const interpolatedType = computed({
   get: () => model.value.onsetType,
+  set: (value: number) => {
+    // Set both onset and offset types to the same value
+    model.value.onsetType = value
+    model.value.offsetType = value
+  }
+})
+
+// Computed property for Peak & Decay mode to gang attack and decay types together
+const peakDecayType = computed({
+  get: () => model.value.offsetType,
   set: (value: number) => {
     // Set both onset and offset types to the same value
     model.value.onsetType = value

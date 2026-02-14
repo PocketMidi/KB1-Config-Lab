@@ -25,9 +25,26 @@
       </div>
 
       <div class="group">
-        <label :for="`push-functionMode-${lever}`">Function Mode</label>
+        <label :for="`push-functionMode-${lever}`">Profile</label>
         <select :id="`push-functionMode-${lever}`" v-model.number="model.functionMode">
           <option v-for="opt in functionModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <!-- Duration control - visible only for Interpolated and Peak & Decay modes -->
+      <div v-if="showTimingControls" class="group">
+        <label :for="`push-duration-${lever}`">Duration</label>
+        <div class="number-with-unit">
+          <input type="number" :id="`push-duration-${lever}`" v-model.number="duration" min="0" max="10000" step="10" />
+          <span>ms</span>
+        </div>
+      </div>
+
+      <!-- Type control - visible only for Interpolated and Peak & Decay modes -->
+      <div v-if="showTimingControls" class="group">
+        <label :for="`push-type-${lever}`">Type</label>
+        <select :id="`push-type-${lever}`" v-model.number="pressType">
+          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
       </div>
 
@@ -49,36 +66,6 @@
       <div class="group">
         <label :for="`push-relativeMax-${lever}`">Relative Max</label>
         <input type="text" :id="`push-relativeMax-${lever}`" :value="relativeMax" readonly class="readonly-field" />
-      </div>
-
-      <div class="group">
-        <label :for="`push-onsetType-${lever}`">Attack Type</label>
-        <select :id="`push-onsetType-${lever}`" v-model.number="model.onsetType">
-          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-      </div>
-
-      <div class="group">
-        <label :for="`push-onsetTime-${lever}`">Attack Time</label>
-        <div class="number-with-unit">
-          <input type="number" :id="`push-onsetTime-${lever}`" v-model.number="model.onsetTime" min="0" max="10000" step="10" />
-          <span>ms</span>
-        </div>
-      </div>
-
-      <div class="group">
-        <label :for="`push-offsetType-${lever}`">Decay Type</label>
-        <select :id="`push-offsetType-${lever}`" v-model.number="model.offsetType">
-          <option v-for="opt in interpolations" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
-        </select>
-      </div>
-
-      <div class="group">
-        <label :for="`push-offsetTime-${lever}`">Decay Time</label>
-        <div class="number-with-unit">
-          <input type="number" :id="`push-offsetTime-${lever}`" v-model.number="model.offsetTime" min="0" max="10000" step="10" />
-          <span>ms</span>
-        </div>
       </div>
     </div>
   </div>
@@ -210,6 +197,31 @@ const relativeMax = computed(() => {
     entry.range.max
   )
   return String(value)
+})
+
+// Computed property to determine if timing controls should be shown
+// Show Duration and Type only for Interpolated (0) and Peak & Decay (1) modes
+// Hide for Static (2) and Reset (3) modes
+const showTimingControls = computed(() => {
+  return model.value.functionMode === 0 || model.value.functionMode === 1
+})
+
+// Computed property to gang both onset and offset times as "Duration"
+const duration = computed({
+  get: () => model.value.onsetTime,
+  set: (value: number) => {
+    model.value.onsetTime = value
+    model.value.offsetTime = value
+  }
+})
+
+// Computed property to gang both onset and offset types as "Type"
+const pressType = computed({
+  get: () => model.value.onsetType,
+  set: (value: number) => {
+    model.value.onsetType = value
+    model.value.offsetType = value
+  }
 })
 </script>
 
