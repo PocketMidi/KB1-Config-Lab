@@ -251,6 +251,8 @@ const interpolatedType = computed({
 })
 
 // Computed property to gang attack and decay times together as "Duration"
+// This applies to all function modes (Interpolated, Peak & Decay, Incremental)
+// to simplify the interface by providing a single unified timing control
 const duration = computed({
   get: () => model.value.onsetTime,
   set: (value: number) => {
