@@ -67,7 +67,7 @@
         />
         
         <LeverPushSettings
-          title="Lever Push"
+          title="Press"
           :lever="1"
           v-model="localSettings.leverPush1"
           :ccOptions="ccOptions"
@@ -92,7 +92,7 @@
         />
         
         <LeverPushSettings
-          title="Lever Push"
+          title="Press"
           :lever="2"
           v-model="localSettings.leverPush2"
           :ccOptions="ccOptions"

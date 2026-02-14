@@ -25,10 +25,18 @@
       </div>
 
       <div class="group">
-        <label for="touch-functionMode">Function Mode</label>
+        <label for="touch-functionMode">Mode</label>
         <select id="touch-functionMode" v-model.number="model.functionMode">
           <option v-for="opt in functionModes" :key="opt.value" :value="opt.value">{{ opt.label }}</option>
         </select>
+      </div>
+
+      <div class="group">
+        <label for="touch-threshold">Threshold</label>
+        <div class="number-with-unit">
+          <input type="number" id="touch-threshold" v-model.number="model.threshold" min="0" max="65535" step="100" />
+          <span class="hint-text">higher = less sensitive</span>
+        </div>
       </div>
 
       <div class="group">
@@ -63,6 +71,7 @@ type TouchModel = {
   minCCValue: number
   maxCCValue: number
   functionMode: number
+  threshold?: number
 }
 
 const props = defineProps<{
@@ -293,6 +302,28 @@ const relativeMax = computed(() => {
 .group select:focus {
   outline: none;
   border-color: var(--color-border-hover);
+}
+
+.number-with-unit {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.number-with-unit input {
+  flex: 1;
+}
+
+.number-with-unit span {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  min-width: 2rem;
+}
+
+.hint-text {
+  font-size: 0.75rem;
+  font-style: italic;
+  white-space: nowrap;
 }
 
 .readonly-field {
