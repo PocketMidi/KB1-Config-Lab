@@ -1,7 +1,7 @@
 <template>
   <header class="mobile-header">
     <div class="header-top">
-      <h1 class="header-title">KB1 config</h1>
+      <img src="/src/assets/ui/KB1-title.svg" alt="KB1" class="header-logo" />
     </div>
     
     <!-- Connection status bar showing device connection state and optional timeout warnings.
@@ -47,7 +47,7 @@ const connectionClass = computed(() => ({
 <style scoped>
 .mobile-header {
   background: var(--color-background-soft);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: none;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -58,6 +58,11 @@ const connectionClass = computed(() => ({
   align-items: center;
   justify-content: center;
   padding: 0.75rem 1rem;
+}
+
+.header-logo {
+  height: 32px;
+  width: auto;
 }
 
 .header-title {
@@ -77,7 +82,7 @@ const connectionClass = computed(() => ({
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  border-top: 1px solid var(--color-border);
+  border-top: none;
   gap: 1rem;
   font-size: 0.8125rem;
 }
