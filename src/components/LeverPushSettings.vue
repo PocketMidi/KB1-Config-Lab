@@ -31,6 +31,32 @@
         </select>
       </div>
 
+      <!-- Min control - visible only for Interpolated and Peak & Decay modes -->
+      <div v-if="showValueControls" class="group">
+        <label :for="`push-min-${lever}`">Min</label>
+        <ValueControl
+          v-model="userMin"
+          :min="0"
+          :max="100"
+          :step="1"
+          :small-step="5"
+          :large-step="10"
+        />
+      </div>
+
+      <!-- Max control - visible only for Interpolated and Peak & Decay modes -->
+      <div v-if="showValueControls" class="group">
+        <label :for="`push-max-${lever}`">Max</label>
+        <ValueControl
+          v-model="userMax"
+          :min="0"
+          :max="100"
+          :step="1"
+          :small-step="5"
+          :large-step="10"
+        />
+      </div>
+
       <!-- Duration control - visible only for Interpolated and Peak & Decay modes -->
       <div v-if="showTimingControls" class="group">
         <label :for="`push-duration-${lever}`">Duration</label>
@@ -48,24 +74,17 @@
         </select>
       </div>
 
-      <div class="group">
-        <label :for="`push-maxCCValue-${lever}`">CC Max</label>
-        <input type="number" :id="`push-maxCCValue-${lever}`" v-model.number="model.maxCCValue" min="0" max="127" />
-      </div>
-
-      <div class="group">
-        <label :for="`push-minCCValue-${lever}`">CC Min</label>
-        <input type="number" :id="`push-minCCValue-${lever}`" v-model.number="model.minCCValue" min="0" max="127" />
-      </div>
-
-      <div class="group">
-        <label :for="`push-relativeMin-${lever}`">Relative Min</label>
-        <input type="text" :id="`push-relativeMin-${lever}`" :value="relativeMin" readonly class="readonly-field" />
-      </div>
-
-      <div class="group">
-        <label :for="`push-relativeMax-${lever}`">Relative Max</label>
-        <input type="text" :id="`push-relativeMax-${lever}`" :value="relativeMax" readonly class="readonly-field" />
+      <!-- Reset Value control - visible only for Reset mode -->
+      <div v-if="isResetMode" class="group">
+        <label :for="`push-reset-value-${lever}`">Reset Value</label>
+        <ValueControl
+          v-model="resetValue"
+          :min="5"
+          :max="100"
+          :step="5"
+          :small-step="5"
+          :large-step="10"
+        />
       </div>
     </div>
   </div>
@@ -73,7 +92,8 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { midiToRelative, type CCEntry } from '../data/ccMap'
+import { type CCEntry } from '../data/ccMap'
+import ValueControl from './ValueControl.vue'
 
 type LeverPushModel = {
   ccNumber: number
@@ -171,39 +191,56 @@ const parameterRange = computed(() => {
   return undefined
 })
 
-// Compute relative min value
-const relativeMin = computed(() => {
-  const entry = currentEntry.value
-  if (!entry?.range) {
-    return '—'
-  }
-  const value = midiToRelative(
-    model.value.minCCValue,
-    entry.range.min,
-    entry.range.max
-  )
-  return String(value)
-})
+// Function mode constants
+const FUNCTION_MODE_INTERPOLATED = 0
+const FUNCTION_MODE_PEAK_DECAY = 1
+const FUNCTION_MODE_RESET = 3
 
-// Compute relative max value
-const relativeMax = computed(() => {
-  const entry = currentEntry.value
-  if (!entry?.range) {
-    return '—'
-  }
-  const value = midiToRelative(
-    model.value.maxCCValue,
-    entry.range.min,
-    entry.range.max
-  )
-  return String(value)
-})
-
-// Computed property to determine if timing controls should be shown
-// Show Duration and Type only for Interpolated (0) and Peak & Decay (1) modes
-// Hide for Static (2) and Reset (3) modes
+// Computed properties to determine which controls to show
+const isResetMode = computed(() => model.value.functionMode === FUNCTION_MODE_RESET)
 const showTimingControls = computed(() => {
-  return model.value.functionMode === 0 || model.value.functionMode === 1
+  return model.value.functionMode === FUNCTION_MODE_INTERPOLATED || model.value.functionMode === FUNCTION_MODE_PEAK_DECAY
+})
+const showValueControls = computed(() => {
+  return model.value.functionMode === FUNCTION_MODE_INTERPOLATED || model.value.functionMode === FUNCTION_MODE_PEAK_DECAY
+})
+
+// Conversion functions
+function unipolarToMidi(userValue: number): number {
+  return Math.round((userValue / 100) * 127)
+}
+
+function midiToUnipolar(midiValue: number): number {
+  return Math.round((midiValue / 127) * 100)
+}
+
+// User-facing Min value (0-100, always unipolar for Press)
+const userMin = computed({
+  get: () => midiToUnipolar(model.value.minCCValue),
+  set: (userValue: number) => {
+    model.value.minCCValue = unipolarToMidi(userValue)
+  }
+})
+
+// User-facing Max value (0-100, always unipolar for Press)
+const userMax = computed({
+  get: () => midiToUnipolar(model.value.maxCCValue),
+  set: (userValue: number) => {
+    model.value.maxCCValue = unipolarToMidi(userValue)
+  }
+})
+
+// Reset Value (5-100 in increments of 5, default 70)
+// In Reset mode, minCCValue stores the reset value, maxCCValue is set to the same
+const resetValue = computed({
+  get: () => {
+    return midiToUnipolar(model.value.minCCValue)
+  },
+  set: (userValue: number) => {
+    const midiValue = unipolarToMidi(userValue)
+    model.value.minCCValue = midiValue
+    model.value.maxCCValue = midiValue
+  }
 })
 
 // Computed property to gang both onset and offset times as "Duration"

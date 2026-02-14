@@ -193,10 +193,10 @@ const leverFunctionModes = [
 ];
 
 // Lever Push Function Modes (firmware values)
+// Note: Static mode removed - firmware supports Interpolated, Peak & Decay, and Reset only
 const leverPushFunctionModes = [
   { value: 0, label: 'Interpolated' },
   { value: 1, label: 'Peak & Decay' },
-  { value: 2, label: 'Static' },
   { value: 3, label: 'Reset' },
 ];
 
