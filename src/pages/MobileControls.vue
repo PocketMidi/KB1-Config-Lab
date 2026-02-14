@@ -186,7 +186,6 @@ const leverFunctionModes = [
 const leverPushFunctionModes = [
   { value: 0, label: 'Interpolated' },
   { value: 1, label: 'Peak & Decay' },
-  { value: 2, label: 'Static' },
   { value: 3, label: 'Reset' },
 ];
 
@@ -208,12 +207,13 @@ const interpolations = [
 ];
 
 // Helper functions to generate subtitles for accordion headers
-// These use the CC map to show user-friendly parameter names and ranges
+// These show user-friendly parameter names and user-facing value ranges
 function getLeverSubtitle(lever: LeverSettingsType): string {
   const ccMap = ccMapByNumber.value;
   const ccInfo = ccMap.get(lever.ccNumber);
   const paramName = ccInfo?.parameter || `CC ${lever.ccNumber}`;
-  const range = ccInfo?.range ? `${ccInfo.range.min} to ${ccInfo.range.max}` : '0 to 127';
+  // Show user-facing range based on polarity
+  const range = lever.valueMode === 1 ? '-100 to 100' : '0 to 100';
   return `${paramName} | ${range} | MIDI CC ${lever.ccNumber}`;
 }
 
@@ -221,7 +221,8 @@ function getLeverPushSubtitle(leverPush: LeverPushSettingsType): string {
   const ccMap = ccMapByNumber.value;
   const ccInfo = ccMap.get(leverPush.ccNumber);
   const paramName = ccInfo?.parameter || `CC ${leverPush.ccNumber}`;
-  const range = ccInfo?.range ? `${ccInfo.range.min} to ${ccInfo.range.max}` : '0 to 127';
+  // Press is always unipolar (0-100)
+  const range = '0 to 100';
   return `${paramName} | ${range} | MIDI CC ${leverPush.ccNumber}`;
 }
 
