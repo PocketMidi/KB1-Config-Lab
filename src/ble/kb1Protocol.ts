@@ -336,7 +336,7 @@ export class KB1Protocol {
       },
       leverPush1: {
         ccNumber: 24,
-        minCCValue: 31,
+        minCCValue: 32,
         maxCCValue: 127,
         functionMode: 0, // Interpolated
         onsetTime: 100,
@@ -346,7 +346,7 @@ export class KB1Protocol {
       },
       lever2: {
         ccNumber: 128,
-        minCCValue: 15,
+        minCCValue: 16,
         maxCCValue: 127,
         stepSize: 8,
         functionMode: 2, // Incremental
@@ -358,8 +358,8 @@ export class KB1Protocol {
       },
       leverPush2: {
         ccNumber: 128,
-        minCCValue: 87,
-        maxCCValue: 87,
+        minCCValue: 89,
+        maxCCValue: 89,
         functionMode: 3, // Reset
         onsetTime: 100,
         offsetTime: 100,
