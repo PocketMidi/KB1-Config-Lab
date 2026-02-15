@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onBeforeUnmount } from 'vue'
 import { type CCEntry } from '../data/ccMap'
 import ValueControl from './ValueControl.vue'
 
@@ -162,7 +162,8 @@ const model = computed({
   set: v => emit('update:modelValue', v)
 })
 
-// Animation constants
+// Constants
+const BASE_PATH = '/KB1-config'
 const TOGGLE_ANIMATION_DURATION = 60 // milliseconds for toggle transition
 
 // Toggle state and animation
@@ -170,27 +171,27 @@ const TOGGLE_ANIMATION_DURATION = 60 // milliseconds for toggle transition
 // isAnimating: prevents rapid toggle clicks during transition animation
 const toggleHovered = ref(false)
 const isAnimating = ref(false)
+const animationTimeoutId = ref<number | null>(null)
 
 const toggleImage = computed(() => {
   const isUnipolar = model.value.valueMode === 0
-  const base = '/KB1-config'
   
   if (isAnimating.value) {
     // During animation, show transition frames
     return isUnipolar 
-      ? `${base}/uni_bi_toggle/l-r_trans.svg`
-      : `${base}/uni_bi_toggle/r-l_trans.svg`
+      ? `${BASE_PATH}/uni_bi_toggle/l-r_trans.svg`
+      : `${BASE_PATH}/uni_bi_toggle/r-l_trans.svg`
   }
   
   if (toggleHovered.value) {
     return isUnipolar 
-      ? `${base}/uni_bi_toggle/l_float.svg`
-      : `${base}/uni_bi_toggle/r_float.svg`
+      ? `${BASE_PATH}/uni_bi_toggle/l_float.svg`
+      : `${BASE_PATH}/uni_bi_toggle/r_float.svg`
   }
   
   return isUnipolar 
-    ? `${base}/uni_bi_toggle/l_active.svg`
-    : `${base}/uni_bi_toggle/r_active.svg`
+    ? `${BASE_PATH}/uni_bi_toggle/l_active.svg`
+    : `${BASE_PATH}/uni_bi_toggle/r_active.svg`
 })
 
 const handleToggleClick = () => {
@@ -199,11 +200,19 @@ const handleToggleClick = () => {
   isAnimating.value = true
   
   // Animate for specified duration then switch
-  setTimeout(() => {
+  animationTimeoutId.value = window.setTimeout(() => {
     model.value.valueMode = model.value.valueMode === 0 ? 1 : 0
     isAnimating.value = false
+    animationTimeoutId.value = null
   }, TOGGLE_ANIMATION_DURATION)
 }
+
+// Cleanup timeout on unmount to prevent memory leaks
+onBeforeUnmount(() => {
+  if (animationTimeoutId.value !== null) {
+    clearTimeout(animationTimeoutId.value)
+  }
+})
 
 // Profile selection logic
 type ProfileType = 'lin' | 'exp' | 'log' | 'inc'
@@ -242,7 +251,6 @@ const selectProfile = (profile: ProfileType) => {
 
 // Profile visualization
 const profileImage = computed(() => {
-  const base = '/KB1-config'
   const polarity = model.value.valueMode === 1 ? 'bi' : 'uni'
   let profile = 'lin' // default
   
@@ -257,8 +265,9 @@ const profileImage = computed(() => {
   
   // Note: Asset file naming uses dash for inc-uni but underscore for all others
   // This matches the existing file naming convention in public/lever_profiles/
+  // Consider standardizing to use consistent separator in future asset updates
   const separator = profile === 'inc' && polarity === 'uni' ? '-' : '_'
-  return `${base}/lever_profiles/${profile}${separator}${polarity}.svg`
+  return `${BASE_PATH}/lever_profiles/${profile}${separator}${polarity}.svg`
 })
 
 // Initialize selectedCategory from current ccNumber's category (fallback to first available category)
