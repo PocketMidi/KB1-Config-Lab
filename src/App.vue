@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import MobileControls from './pages/MobileControls.vue';
 import MobileScales from './pages/MobileScales.vue';
 import MobileSliders from './pages/MobileSliders.vue';
+import FirstTimeOverlay from './components/FirstTimeOverlay.vue';
+import ContextualConnectionModal from './components/ContextualConnectionModal.vue';
 import { useDeviceState } from './composables/useDeviceState';
 import './styles/themes/kb1.css';
-import { computed } from 'vue';
 
 const { 
   isBluetoothAvailable, 
@@ -27,6 +28,11 @@ const tabs = [
 // Hover state for bluetooth connection section (text and icon)
 const isHoveringStatus = ref(false);
 
+// Modal states
+const FIRST_TIME_KEY = 'kb1-ble-intro-seen';
+const showFirstTimeOverlay = ref(false);
+const showContextualModal = ref(false);
+
 // Computed property for bluetooth status text
 const bluetoothStatusText = computed(() => {
   if (isConnected.value) {
@@ -35,9 +41,20 @@ const bluetoothStatusText = computed(() => {
   return isHoveringStatus.value ? 'CONNECT' : 'DISCONNECTED';
 });
 
+// Check if first-time overlay should be shown
+onMounted(() => {
+  const hasSeenIntro = localStorage.getItem(FIRST_TIME_KEY);
+  if (!hasSeenIntro && !isConnected.value) {
+    showFirstTimeOverlay.value = true;
+  }
+});
+
 async function handleConnect() {
   try {
     await connect();
+    // Close any open modals on successful connection
+    showFirstTimeOverlay.value = false;
+    showContextualModal.value = false;
   } catch (error) {
     console.error('Connection failed:', error);
   }
@@ -51,10 +68,66 @@ async function handleDisconnect() {
   }
 }
 
+function handleFirstTimeDismiss() {
+  showFirstTimeOverlay.value = false;
+  localStorage.setItem(FIRST_TIME_KEY, 'true');
+}
+
+function handleContextualDismiss() {
+  showContextualModal.value = false;
+}
+
+function handleDisabledControlClick() {
+  if (!isConnected.value) {
+    showContextualModal.value = true;
+  }
+}
+
+function handleMainClick(event: MouseEvent) {
+  if (!isConnected.value) {
+    const target = event.target as HTMLElement;
+    
+    // Check if the click was on a disabled control (input, select, button, slider, etc.)
+    const isControl = target.tagName === 'INPUT' || 
+                      target.tagName === 'SELECT' || 
+                      target.tagName === 'BUTTON' ||
+                      target.closest('.value-control') ||
+                      target.closest('.slider-control') ||
+                      target.closest('.form-control');
+    
+    // Don't trigger for accordion headers (they should still work when disconnected)
+    const isAccordionHeader = target.closest('.accordion-header');
+    
+    if (isControl && !isAccordionHeader) {
+      event.preventDefault();
+      event.stopPropagation();
+      showContextualModal.value = true;
+    }
+  }
+}
+
+// Make handleDisabledControlClick available globally for child components
+// This allows any component to trigger the contextual modal
+(window as any).__kb1_showConnectionModal = handleDisabledControlClick;
+
 </script>
 
 <template>
   <div class="app theme-kb1">
+    <!-- First-Time Overlay -->
+    <FirstTimeOverlay
+      :show="showFirstTimeOverlay"
+      @connect="handleConnect"
+      @dismiss="handleFirstTimeDismiss"
+    />
+    
+    <!-- Contextual Connection Modal -->
+    <ContextualConnectionModal
+      :show="showContextualModal"
+      @connect="handleConnect"
+      @dismiss="handleContextualDismiss"
+    />
+    
     <!-- Unified Responsive Layout -->
     <header class="app-header">
       <div class="header-content">
@@ -107,7 +180,7 @@ async function handleDisconnect() {
       <div class="nav-divider"></div>
     </div>
     
-    <main class="app-main">
+    <main class="app-main" @click="handleMainClick">
       <MobileControls v-if="activeTab === 'controls'" />
       <MobileScales v-if="activeTab === 'scales'" />
       <MobileSliders v-if="activeTab === 'sliders'" />
@@ -210,15 +283,16 @@ body {
   cursor: pointer !important;
 }
 
-/* But keep form controls disabled when disconnected */
+/* Enhanced disabled state for form controls when disconnected */
 .disconnected-state .form-control,
 .disconnected-state input,
 .disconnected-state select,
 .disconnected-state button:not(.accordion-header),
 .disconnected-state .group input,
 .disconnected-state .group select {
-  pointer-events: none !important;
-  cursor: not-allowed !important;
+  opacity: 0.4;
+  cursor: not-allowed;
+  position: relative;
 }
 </style>
 
