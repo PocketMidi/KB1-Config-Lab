@@ -423,6 +423,7 @@ body {
 .app-main {
   flex: 1;
   background: var(--color-background);
+  padding-bottom: 100px; /* Add padding to account for fixed footer bar */
 }
 
 .app-footer {
@@ -431,6 +432,7 @@ body {
   padding: 2rem;
   text-align: center;
   margin-top: auto;
+  margin-bottom: 80px; /* Account for fixed action bar at bottom */
 }
 
 .app-footer p {
