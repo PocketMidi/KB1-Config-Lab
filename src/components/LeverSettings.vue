@@ -162,7 +162,12 @@ const model = computed({
   set: v => emit('update:modelValue', v)
 })
 
+// Animation constants
+const TOGGLE_ANIMATION_DURATION = 60 // milliseconds for toggle transition
+
 // Toggle state and animation
+// toggleHovered: tracks hover state for visual feedback (shows float state)
+// isAnimating: prevents rapid toggle clicks during transition animation
 const toggleHovered = ref(false)
 const isAnimating = ref(false)
 
@@ -193,11 +198,11 @@ const handleToggleClick = () => {
   
   isAnimating.value = true
   
-  // Animate for 60ms then switch
+  // Animate for specified duration then switch
   setTimeout(() => {
     model.value.valueMode = model.value.valueMode === 0 ? 1 : 0
     isAnimating.value = false
-  }, 60)
+  }, TOGGLE_ANIMATION_DURATION)
 }
 
 // Profile selection logic
@@ -250,7 +255,8 @@ const profileImage = computed(() => {
     else profile = 'lin'
   }
   
-  // Handle the naming convention: inc-uni.svg (dash) vs inc_bi.svg (underscore)
+  // Note: Asset file naming uses dash for inc-uni but underscore for all others
+  // This matches the existing file naming convention in public/lever_profiles/
   const separator = profile === 'inc' && polarity === 'uni' ? '-' : '_'
   return `${base}/lever_profiles/${profile}${separator}${polarity}.svg`
 })
