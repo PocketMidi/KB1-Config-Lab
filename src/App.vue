@@ -471,7 +471,7 @@ body {
 }
 
 .bluetooth-icon {
-  height: 32px;
+  height: 32px; /* Scaled up by 60% per requirements (160% of original) */
   width: auto;
   transition: filter 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transform-origin: center;
