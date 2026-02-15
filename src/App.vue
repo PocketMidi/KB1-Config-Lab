@@ -12,9 +12,7 @@ const {
   isBluetoothAvailable, 
   isConnected, 
   deviceName, 
-  connect, 
-  disconnect,
-  isLoading
+  connect
 } = useDeviceState();
 
 // Desktop tabs - now matching mobile structure
@@ -39,14 +37,6 @@ async function handleConnect() {
     await connect();
   } catch (error) {
     console.error('Connection failed:', error);
-  }
-}
-
-async function handleDisconnect() {
-  try {
-    await disconnect();
-  } catch (error) {
-    console.error('Disconnect failed:', error);
   }
 }
 
