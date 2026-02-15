@@ -1,16 +1,7 @@
 <template>
   <header class="mobile-header">
     <div class="header-top">
-      <!-- Disconnected state: Show BLUETOOTH CONNECT button -->
-      <button 
-        v-if="!isConnected" 
-        class="bluetooth-connect-btn"
-        @click="$emit('connect')"
-      >
-        BLUETOOTH CONNECT
-      </button>
-      
-      <!-- Always show KB1 logo -->
+      <!-- Always show KB1 logo - centered -->
       <img src="/kb1-title.svg" alt="KB1 CONFIGURATOR" class="header-logo" />
     </div>
   </header>
@@ -39,37 +30,8 @@ defineEmits<{
 .header-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem 2rem;
-  gap: 2rem;
-}
-
-/* When only logo is present (connected state), center it */
-.header-top:not(:has(.bluetooth-connect-btn)) {
   justify-content: center;
-}
-
-/* Bluetooth Connect Button - Disconnected State */
-.bluetooth-connect-btn {
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  border: 2px solid #47708E;
-  border-radius: 6px;
-  color: #47708E;
-  font-family: 'Roboto Mono', monospace;
-  font-weight: 700;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.bluetooth-connect-btn:hover {
-  background: rgba(71, 112, 142, 0.1);
-}
-
-.bluetooth-connect-btn:active {
-  transform: scale(0.98);
+  padding: 1.5rem 2rem;
 }
 
 .header-logo {

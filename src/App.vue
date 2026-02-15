@@ -67,26 +67,6 @@ async function handleDisconnect() {
         ⚠️ Web Bluetooth is not supported in this browser. Please use Chrome, Edge, or Opera.
       </div>
       
-      <div class="mobile-connect-section" v-if="!isConnected">
-        <button 
-          class="btn btn-connect mobile-connect-btn"
-          @click="handleConnect"
-          :disabled="!isBluetoothAvailable || isLoading"
-        >
-          <span v-if="isLoading">Connecting...</span>
-          <span v-else>Connect Device</span>
-        </button>
-      </div>
-      
-      <button 
-        v-if="isConnected"
-        class="btn btn-disconnect mobile-disconnect-btn"
-        @click="handleDisconnect"
-        :disabled="isLoading"
-      >
-        Disconnect
-      </button>
-      
       <MobileTabNav
         :tabs="mobileTabs"
         :is-connected="isConnected"
@@ -139,11 +119,11 @@ async function handleDisconnect() {
           >
             SLIDERS
           </button>
+          <div class="separator"></div>
         </div>
         
         <!-- Bluetooth status section -->
         <div class="bluetooth-status" :class="{ connected: isConnected }">
-          <div class="separator"></div>
           <span 
             class="status-text" 
             :class="{ connected: isConnected, hoverable: !isConnected }"
@@ -287,22 +267,6 @@ body {
   min-height: 100vh;
 }
 
-.mobile-connect-section {
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-}
-
-.mobile-connect-btn {
-  width: 100%;
-  max-width: 400px;
-}
-
-.mobile-disconnect-btn {
-  margin: 0.5rem 1rem;
-  width: calc(100% - 2rem);
-}
-
 .mobile-main {
   flex: 1;
   overflow-y: auto;
@@ -350,7 +314,7 @@ body {
 }
 
 .header-logo {
-  height: 90px; /* 150% of original 60px */
+  height: 60px; /* Same size as mobile */
   width: auto;
 }
 
@@ -378,6 +342,7 @@ body {
 .nav-tabs {
   display: flex;
   gap: 0;
+  align-items: center;
 }
 
 .nav-tab {
@@ -442,8 +407,8 @@ body {
   width: 2px;
   height: 1.25rem;
   background: rgba(234, 234, 234, 0.3);
-  align-self: center;
-  flex-shrink: 0; /* Prevent separator from moving */
+  margin-left: 1.5rem;
+  flex-shrink: 0;
 }
 
 .status-text {
@@ -452,8 +417,7 @@ body {
   font-size: 0.875rem;
   color: #47708E;
   opacity: 0.5;
-  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  transform-origin: center;
+  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, font-weight 0.5s ease-in-out;
 }
 
 .status-text.hoverable {
@@ -463,7 +427,7 @@ body {
 .status-text.hoverable:hover {
   color: #74C4FF;
   opacity: 1;
-  transform: scale(1.1);
+  font-weight: 700;
 }
 
 .status-text.connected {

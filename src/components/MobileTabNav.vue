@@ -12,6 +12,7 @@
         >
           {{ tab.label }}
         </button>
+        <div class="separator"></div>
       </div>
       
       <!-- Bluetooth status section -->
@@ -24,7 +25,6 @@
         @mouseenter="!isConnected && (isHovering = true)"
         @mouseleave="isHovering = false"
       >
-        <div class="separator"></div>
         <span class="status-text">
           {{ isConnected ? 'CONNECTED' : (isHovering ? 'CONNECT' : 'DISCONNECTED') }}
         </span>
@@ -79,6 +79,7 @@ const isHovering = ref(false);
 .tab-buttons {
   display: flex;
   flex: 1;
+  align-items: center;
 }
 
 .tab-button {
@@ -156,7 +157,7 @@ const isHovering = ref(false);
   width: 2px;
   height: 1.25rem;
   background: rgba(234, 234, 234, 0.3);
-  align-self: center;
+  margin-left: 1rem;
   flex-shrink: 0;
 }
 
@@ -166,15 +167,14 @@ const isHovering = ref(false);
   font-size: 0.875rem;
   color: #47708E;
   opacity: 0.5;
-  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  transform-origin: center;
+  transition: color 0.5s ease-in-out, opacity 0.5s ease-in-out, font-weight 0.5s ease-in-out;
 }
 
 .bluetooth-status.hoverable:hover .status-text,
 .bluetooth-status.hoverable:active .status-text {
   color: #74C4FF;
   opacity: 1;
-  transform: scale(1.1);
+  font-weight: 700;
 }
 
 .bluetooth-status.connected .status-text {
