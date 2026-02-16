@@ -30,8 +30,10 @@ export function useKeepAlive(bleClient: BLEClient) {
    */
   const startIfConnected = () => {
     if (bleClient.isConnected()) {
-      keepAliveService.startKeepAlive();
-      isKeepAliveActive.value = true;
+      setTimeout(() => {
+        keepAliveService.startKeepAlive();
+        isKeepAliveActive.value = true;
+      }, 3000);
     }
   };
 
@@ -70,8 +72,10 @@ export function useKeepAlive(bleClient: BLEClient) {
     // Listen for connection status changes
     bleClient.setStatusChangeCallback((status) => {
       if (status.connected) {
-        keepAliveService.startKeepAlive();
-        isKeepAliveActive.value = true;
+        setTimeout(() => {
+          keepAliveService.startKeepAlive();
+          isKeepAliveActive.value = true;
+        }, 3000);
       } else {
         stop();
       }
