@@ -473,26 +473,6 @@ const duration = computed({
   .settings-lever {
     padding: 1rem;
   }
-  
-  .profile-visualization {
-    margin: 1rem auto;
-    padding: 0.75rem;
-    min-height: 200px;
-  }
-  
-  .profile-visualization img {
-    object-fit: contain;
-  }
-}
-
-@media (max-width: 480px) {
-  .controls-row {
-    gap: 1rem;
-  }
-  
-  .profile-visualization {
-    min-height: 180px;
-  }
 }
 
 .controls-row {
@@ -574,12 +554,36 @@ const duration = computed({
   justify-content: center;
   align-items: center;
   width: 100%;
+  max-width: 600px;
 }
 
 .profile-visualization img {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Mobile-specific sizing */
+@media (max-width: 768px) {
+  .profile-visualization {
+    margin: 1rem auto;
+    padding: 0.75rem;
+    min-height: 200px;
+  }
+  
+  .profile-visualization img {
+    object-fit: contain;
+  }
+}
+
+@media (max-width: 480px) {
+  .controls-row {
+    gap: 1rem;
+  }
+  
+  .profile-visualization {
+    min-height: 180px;
+  }
 }
 
 .inputs {
