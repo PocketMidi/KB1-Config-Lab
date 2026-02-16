@@ -552,16 +552,13 @@ const duration = computed({
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-width: 583px; /* Native SVG size - don't scale below this */
-  max-width: 100%;
+  min-width: min(583px, 100%); /* Native SVG size, but allow smaller on mobile */
 }
 
 .profile-visualization img {
-  max-width: 100%;
   width: 100%;
   height: auto;
   display: block;
-  min-width: 583px; /* Match container minimum */
 }
 
 /* Mobile-specific sizing */
