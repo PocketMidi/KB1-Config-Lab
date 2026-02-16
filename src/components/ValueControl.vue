@@ -150,6 +150,9 @@ function validateAndUpdate(event: Event) {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .control-row {
@@ -165,7 +168,8 @@ function validateAndUpdate(event: Event) {
   background: var(--color-background);
   color: var(--color-text);
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
   transition: all 0.2s;
   min-width: 2.5rem;
 }
@@ -191,7 +195,8 @@ function validateAndUpdate(event: Event) {
   border-radius: 4px;
   background: var(--color-background);
   color: var(--color-text);
-  font-size: 1rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
   text-align: center;
   min-width: 0;
 }
@@ -248,7 +253,8 @@ function validateAndUpdate(event: Event) {
 .range-labels {
   display: flex;
   justify-content: space-between;
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13px */
+  font-family: 'Roboto Mono', monospace;
   color: var(--color-text-muted);
   padding: 0 0.5rem;
 }
