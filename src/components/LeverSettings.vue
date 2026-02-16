@@ -555,6 +555,7 @@ const duration = computed({
   align-items: center;
   width: 100%;
   max-width: 600px;
+  overflow: hidden;
 }
 
 .profile-visualization img {
