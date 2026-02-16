@@ -552,6 +552,7 @@ const duration = computed({
   justify-content: center;
   align-items: center;
   width: 100%;
+  min-width: min(583px, 100%); /* Native SVG size, but allow smaller on mobile */
 }
 
 .profile-visualization img {
